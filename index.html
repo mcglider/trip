@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Trip Registration</title>
+  <style>
+    :root {
+      --accent: #2563eb;
+      --ok: #16a34a;
+      --warn: #b45309;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+    }
+    h1, h2 { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    form {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      align-items: end;
+    }
+    label { font-size: 14px; color: var(--muted); display: block; }
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fff;
+    }
+    button {
+      padding: 12px 16px;
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat .label { font-size: 12px; color: var(--muted); }
+    .stat .value { font-size: 24px; font-weight: 700; }
+    .success { color: var(--ok); font-weight: 600; }
+    .error { color: #b91c1c; font-weight: 600; }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .table th, .table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+    }
+    .table th { background: #f1f5f9; color: #0f172a; }
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .footer-note { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    @media (max-width: 720px) {
+      form { grid-template-columns: 1fr 1fr 1fr; }
+      form button { grid-column: 1 / -1; }
+      .stats { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Family Trip Registration</h1>
+      <p class="muted">Adults = 1 seat • Kids = 0.5 seat • Total seats: <strong id="totalSeats">26</strong></p>
+
+      <form id="regForm">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Full name" required />
+        </div>
+        <div>
+          <label for="type">Type</label>
+          <select id="type" name="type" required>
+            <option value="Adult">Adult</option>
+            <option value="Kid">Kid</option>
+          </select>
+        </div>
+        <div>
+          <label>Calculated Seats</label>
+          <div class="pill" id="calcSeats">1</div>
+        </div>
+        <button type="submit" id="submitBtn">Register</button>
+      </form>
+
+      <div id="message" style="margin-top:10px;"></div>
+      <div class="footer-note">The list below updates when the page loads or after a successful submission.</div>
+    </div>
+
+    <div class="card">
+      <h2>Current Status</h2>
+      <div class="stats" style="margin-top: 10px;">
+        <div class="stat">
+          <div class="label">Seats Taken</div>
+          <div class="value" id="seatsTaken">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Seats Remaining</div>
+          <div class="value" id="seatsRemaining">26</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total Capacity</div>
+          <div class="value" id="seatsTotal">26</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Registered People</h2>
+      <table class="table" id="listTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Seats</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="listBody">
+          <tr><td colspan="4" class="muted">No registrations yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ======== CONFIG ========
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxD8B0KHZSx_CzC3E2g-xGikYA3SqZAD-LGFWlvR03f4XtFEISB70RlhkPXFhBtCCke/exec';
+    const TOTAL_SEATS = 26;
+
+    // ======== UI Elements ========
+    const form = document.getElementById('regForm');
+    const nameEl = document.getElementById('name');
+    const typeEl = document.getElementById('type');
+    const calcSeatsEl = document.getElementById('calcSeats');
+    const msgEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const takenEl = document.getElementById('seatsTaken');
+    const remainingEl = document.getElementById('seatsRemaining');
+    const totalEl = document.getElementById('seatsTotal');
+    const listBody = document.getElementById('listBody');
+    const totalSeatsLabel = document.getElementById('totalSeats');
+    totalEl.textContent = String(TOTAL_SEATS);
+    totalSeatsLabel.textContent = String(TOTAL_SEATS);
+
+    function calcSeats(typeVal) {
+      return (String(typeVal).toLowerCase() === 'kid') ? 0.5 : 1;
+    }
+
+    function setMessage(text, ok = true) {
+      msgEl.innerHTML = text ? `<span class="${ok ? 'success' : 'error'}">${text}</span>` : '';
+    }
+
+    function lockForm(lock) {
+      nameEl.disabled = lock;
+      typeEl.disabled = lock;
+      submitBtn.disabled = lock;
+    }
+
+    function renderTable(rows) {
+      if (!rows || rows.length === 0) {
+        listBody.innerHTML = `<tr><td colspan="4" class="muted">No registrations yet.</td></tr>`;
+        return;
+      }
+      listBody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${escapeHtml(r.Name)}</td>
+          <td>${escapeHtml(r.Type)}</td>
+          <td>${Number(r.Seats).toFixed(1)}</td>
+          <td>${escapeHtml(r.Timestamp || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    async function refreshList() {
+      try {
+        const url = GAS_URL; // doGet
+        const res = await fetch(url, { method: 'GET' });
+        const data = await res.json();
+        const rows = data.rows || [];
+
+        // If backend didn't compute totals (it does), compute here as fallback
+        const taken = (data.totals && typeof data.totals.taken === 'number')
+          ? data.totals.taken
+          : rows.reduce((sum, r) => sum + (Number(r.Seats) || 0), 0);
+        const remaining = Math.max(0, TOTAL_SEATS - taken);
+
+        takenEl.textContent = taken % 1 === 0 ? taken : taken.toFixed(1);
+        remainingEl.textContent = remaining % 1 === 0 ? remaining : remaining.toFixed(1);
+        renderTable(rows);
+      } catch (err) {
+        setMessage('Failed to fetch current list. Please try again.', false);
+        console.error(err);
+      }
+    }
+
+    typeEl.addEventListener('change', () => {
+      calcSeatsEl.textContent = String(calcSeats(typeEl.value));
+    });
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      setMessage('');
+      lockForm(true);
+
+      const name = nameEl.value.trim();
+      const type = typeEl.value;
+      const seats = calcSeats(type);
+
+      if (!name) {
+        setMessage('Please enter a name.', false);
+        lockForm(false);
+        return;
+      }
+
+      try {
+        // Send as text/plain to avoid CORS preflight with Apps Script
+        const payload = { name, type, seats };
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (data && data.success) {
+          setMessage('Registration successful!', true);
+          form.reset();
+          typeEl.value = 'Adult';
+          calcSeatsEl.textContent = '1';
+          await refreshList();
+        } else {
+          const msg = (data && data.message) ? data.message : 'Failed to save. Please try again.';
+          setMessage(msg, false);
+        }
+      } catch (err) {
+        console.error(err);
+        setMessage('Network error. Please try again.', false);
+      } finally {
+        lockForm(false);
+      }
+    });
+
+    // Initial load
+    refreshList();
+  </script>
+</body>
+</html>
